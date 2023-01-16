@@ -1,0 +1,29 @@
+﻿<UserControl x:Class="TaxiApp.View.TaxiAccept"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:TaxiApp.View"
+             xmlns:converter="clr-namespace:TaxiApp.Converters"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800" Height="150" Width="250">
+    <UserControl.Resources>
+        <converter:DoubleToStringConverter  x:Key="DoubleToStringConverter"/>
+    </UserControl.Resources>
+    <Grid>
+        <Rectangle RadiusX="20" RadiusY="20">
+            <Rectangle.Fill>
+                White
+            </Rectangle.Fill>
+        </Rectangle>
+        <StackPanel Background="Transparent">
+            <TextBlock VerticalAlignment="Center" Foreground="Purple" Margin="30,10" FontWeight="DemiBold" FontFamily="Segoe UI Emo" HorizontalAlignment="Left"  FontSize="20" Text="KM:" ></TextBlock>
+            <TextBlock VerticalAlignment="Center" Foreground="Purple" Margin="30,-7" FontWeight="DemiBold" FontFamily="Segoe UI Emo" HorizontalAlignment="Left"  FontSize="20" Text="Price:" ></TextBlock>
+            <TextBlock  Foreground="Purple" Margin="70,-50,10,50" FontWeight="DemiBold" FontFamily="Segoe UI Emo"  FontSize="20"  Text="{Binding polylineService.Distance}" ></TextBlock>
+            <TextBlock  Foreground="Purple" Margin="85,-47,10,50" FontWeight="DemiBold" FontFamily="Segoe UI Emo"  FontSize="20"  Text="{Binding polylineService.PriceForDrive,Converter={StaticResource DoubleToStringConverter}}" ></TextBlock>
+            <TextBlock VerticalAlignment="Center" Foreground="Black" Margin="30,-600,0,-600" FontWeight="DemiBold" FontFamily="Segoe UI Emo" HorizontalAlignment="Left"  FontSize="14" Text=" Do you want to order a taxi?" Height="70" ></TextBlock>
+            <Button  Name="Yes" Content="YES" Margin="30,-10,0,10" HorizontalAlignment="Left" Width="75"  Command="{Binding TaxiAccepted}"></Button>
+            <Button Name="No"   Content="NO" Margin="0,-42,30,10"  HorizontalAlignment="Right" Width="75" Command="{Binding TaxiDenied}"></Button>
+        </StackPanel>
+    </Grid>
+</UserControl>

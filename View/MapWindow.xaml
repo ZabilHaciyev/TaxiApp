@@ -1,0 +1,132 @@
+﻿<Window x:Class="TaxiApp.MapWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TaxiApp"
+        xmlns:map="clr-namespace:Microsoft.Maps.MapControl.WPF;assembly=Microsoft.Maps.MapControl.WPF"
+        xmlns:ViewModel="clr-namespace:TaxiApp.ViewModels"
+        xmlns:converter="clr-namespace:TaxiApp.Converters"
+        xmlns:view="clr-namespace:TaxiApp.View"
+        mc:Ignorable="d"
+        Title="MapWindow" Height="450" Width="800">
+
+    <!--<Window.DataContext>
+        <ViewModel:MapViewModel/>
+    </Window.DataContext>-->
+    
+    <Window.Resources>
+        <ControlTemplate x:Key="TaxiIcon" TargetType="map:Pushpin">
+            <Image Source="\Images\Taxi_icon.png"/>
+        </ControlTemplate>
+        <ControlTemplate x:Key="UserIcon" TargetType="map:Pushpin">
+            <Image Source="\Images\UserPin.png"/>
+        </ControlTemplate>
+        <converter:RatingToStringConverter x:Key="RatingToStringConverter"/>
+        <ControlTemplate x:Key="NearTaxiIcon" TargetType="map:Pushpin">
+
+            <Image Source="\Images\Coming_taxi.png" Height="30" Width="30" RenderTransformOrigin="0.5,0.5" >
+                <Image.RenderTransform>
+                    <TransformGroup>
+                        <ScaleTransform/>
+                        <SkewTransform/>
+                        <RotateTransform Angle="{Binding Angle}"/>
+                        <TranslateTransform/>
+                    </TransformGroup>
+                </Image.RenderTransform>
+            </Image>
+
+        </ControlTemplate>
+        <ControlTemplate x:Key="myToolTip"  TargetType="ToolTip" >
+        <Grid Background="White" Width="250" >
+
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="5"/>
+
+                    <RowDefinition Height="70"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="70"/>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="70"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="5"/>
+                </Grid.RowDefinitions>
+
+
+                <Ellipse Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                        Width="70"  
+                                        Height="70"  
+                                        Stroke="Transparent"  
+                                        StrokeThickness="0">
+                    <Ellipse.Fill>
+                        <ImageBrush ImageSource="{Binding NearDriver.Image}"/>
+                    </Ellipse.Fill>
+                </Ellipse>
+
+                <Label HorizontalAlignment="Center" Content="{Binding  NearDriver}" Grid.Row="2" FontSize="15"/>
+                <Grid Grid.Row="3">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="30"/>
+                        <ColumnDefinition Width="100"/>
+                    </Grid.ColumnDefinitions>
+                    <Image  Width="25" Height="25" Source="/Images/phone.png"/>
+                    <Label VerticalAlignment="Center" FontSize="12" Grid.Column="1" Content="{Binding  NearDriver.Phone}"/>
+                </Grid>
+
+                <Grid Grid.Row="4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="30"/>
+                        <ColumnDefinition Width="100"/>
+                    </Grid.ColumnDefinitions>
+                    <Image Width="25" Height="25" Source="/Images/rating.png"/>
+                    <Label VerticalAlignment="Center" FontSize="12" Grid.Column="1" Content="{Binding NearDriver.Rating,Converter={StaticResource RatingToStringConverter}}"/>
+                </Grid>
+
+                <Rectangle Grid.Row="5" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                        Width="150"  
+                                        Height="100"  
+                                        Stroke="Transparent"  
+                                        StrokeThickness="0">
+                    <Rectangle.Fill>
+                        <ImageBrush ImageSource="{Binding  NearDriver.Car.Image}"/>
+                    </Rectangle.Fill>
+                </Rectangle>
+
+                <Label HorizontalAlignment="Center" Grid.Row="6" FontSize="15"  Content="{Binding  NearDriver.Car}" />
+
+                <Rectangle Grid.Row="7" Fill="#3367D6" Width="300"  Height="50"/>
+                <Rectangle Grid.Row="0" Fill="#3367D6" Width="300"  Height="50"/>
+
+            </Grid>
+        </ControlTemplate>
+    </Window.Resources>
+        <Grid>
+
+        <map:Map   Center="40.409264, 49.867092" ZoomLevel="12"   CredentialsProvider="{Binding Provider}"  >
+            <map:Pushpin Height="50" Width="50" Template="{StaticResource UserIcon }"  FontSize="8" Location="{Binding UserLocation}"  >
+            </map:Pushpin>
+            <map:Pushpin RenderSize="100,100" Background="Black" Visibility="{Binding SelectedPlaceVisibility}" Foreground="White" Content="{Binding Path=SelectedPlaceWhereTo.Name}" FontSize="8" Location="{Binding Path=SelectedPlaceWhereTo.Location}" ></map:Pushpin>
+            <map:MapItemsControl ItemsSource="{Binding Drivers}">
+                <map:MapItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <map:Pushpin  Location="{Binding Location}" Template="{StaticResource TaxiIcon}" Content="{Binding Firstname}"/>
+                    </DataTemplate>
+                </map:MapItemsControl.ItemTemplate>
+            </map:MapItemsControl>
+
+            <map:MapPolyline  Locations="{Binding PolyLineLocations}" Stroke="Red" StrokeThickness="5" />
+            <map:Pushpin Name="NearDriver"  Template="{StaticResource NearTaxiIcon}" Location="{Binding NearDriver.Location,Mode=TwoWay}" Visibility="{Binding NearDriverVisibility}">
+                <map:Pushpin.ToolTip  >
+                    <ToolTip   Template="{StaticResource myToolTip }">
+                    </ToolTip>
+                </map:Pushpin.ToolTip>
+            </map:Pushpin>
+        </map:Map>
+
+        <view:SideNavigationPanel HorizontalAlignment="Left"></view:SideNavigationPanel>
+        <view:TaxiAccept x:Name="TaxiAcceptUC" VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="{Binding TaxiOrderVisibility}"></view:TaxiAccept>
+        <view:RatingControl VerticalAlignment="Center" HorizontalAlignment="Center"  ></view:RatingControl>
+
+    </Grid>
+</Window>
